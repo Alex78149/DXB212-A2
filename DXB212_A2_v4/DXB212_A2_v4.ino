@@ -217,7 +217,7 @@ void loop() {
       //Serial.println("step input is ");
       //Serial.println(newStep);
       sequenceLength += 1;
-      smState = playSequence;
+      smState = passGame;
     } else if (cSlider != 0) {
 
       if (getSliderPos() != 0) {
@@ -231,7 +231,7 @@ void loop() {
         sliderMaxVal = 15;
         stepArray[sequenceLength] = 5;
         sliderArray[sequenceLength] = newStep;
-        Serial.println("this has now run");
+        sliderTone(newStep);
         sequenceLength += 1;
         currentStep = 0;
         smState = passGame;
@@ -240,11 +240,19 @@ void loop() {
   }
 
   if (smState == passGame) {
-    Serial.println("heyhey");
+    clearPixels();
+    fillPixels(50, 219, 87);
+    showPixels();
+    delay(400);
     smState = playSequence;
   }
 }
 
+void fillPixels(int r,int g, int b){
+  int bitColour = pixels.Color(r,g,b);
+  pixels.fill(bitColour,0,16);
+  scorePixel.fill(bitColour,0,16);
+}
 
 //OUTPUT ZONE
 
@@ -287,6 +295,21 @@ void led(int ledNum, int brightness) {
   }
 }
 
+void sliderTone(int zone){
+  switch (zone) {
+    case 1:
+    playTone(5);
+    delay(100);
+    noTone(buzzer);
+    break;
+    case 2:
+    playTone(6);
+    delay(100);
+    noTone(buzzer);
+    break;
+  }
+}
+
 void playTone(int frequency) {
   int duration = 100;
   switch (frequency) {
@@ -301,6 +324,12 @@ void playTone(int frequency) {
       break;
     case 4:
       tone(buzzer, NOTE_F4);
+      break;
+    case 5:
+      tone(buzzer, NOTE_G4);
+      break;
+    case 6:
+      tone(buzzer, NOTE_A4);
       break;
   }
 }
@@ -413,7 +442,7 @@ void setPixelsPos() {
 //returns action inclusive and slider
 
 int getSliderPos() {
-  if (analogRead(5) < 25) {
+  if (analogRead(5) < 50) {
     return 0;
   } else {
     return analogRead(5);
@@ -430,7 +459,7 @@ void sliderPeak() {
 }
 
 //zone 1 starts two pixels in
-int z1Start = 2;
+int z1Start = 3;
 int z1End = z1Start + 4;
 int z1StartPos = getPosFromPix(z1Start);
 int z1EndPos = getPosFromPix(z1End);
